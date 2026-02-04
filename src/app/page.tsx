@@ -3,6 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Check,  Lock, MousePointer2 } from "lucide-react";
+import { SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignInButton, SignOutButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 
 const Navbar = () => {
   return (
@@ -26,13 +28,19 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="flex items-center gap-2 text-gray-600 font-medium hover:text-black transition-colors">
+        <SignedOut>
+           <div className="flex items-center gap-2 text-gray-600 font-medium hover:text-black transition-colors hover:cursor-pointer">
           <Lock size={18} />
-          Login
-        </button>
-        <button className="bg-[#3b82f6] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20">
-          Sign up For Free
-        </button>
+          <SignInButton />
+        </div>
+          <div className="bg-[#3b82f6] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 hover:cursor-pointer">
+            <SignUpButton />
+          </div>
+        </SignedOut>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+       
       </div>
     </nav>
   );
