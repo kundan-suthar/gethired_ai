@@ -1,3 +1,5 @@
+"use client"
+
 import {
   SignedIn,
   SignedOut,
@@ -6,21 +8,20 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Lock } from "lucide-react";
-import { checkUser } from "../../prisma/checkUser";
+import Link from "next/link";
 
-export default async function Navbar() {
-  //await checkUser();
+export default function Navbar() {
   return (
     <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 p-6 bg-black rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl ">get</span>
-          </div>
-          <span className="text-2xl font-bold tracking-tight">hired</span>
+      <Link href="/" className="flex items-center gap-2">
+        <div className="w-8 h-8 p-6 bg-black rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-xl ">get</span>
         </div>
+        <span className="text-2xl font-bold tracking-tight">hired</span>
+      </Link>
 
-        <div className="hidden md:flex items-center gap-6 text-gray-600 font-medium">
+      <div className="hidden md:flex items-center gap-8">
+        <div className="flex items-center gap-6 text-gray-600 font-medium">
           <button
             className="flex items-center gap-1 hover:text-black transition-colors hover:cursor-pointer"
             onClick={() => {
@@ -55,7 +56,12 @@ export default async function Navbar() {
           </div>
         </SignedOut>
         <SignedIn>
-          <UserButton />
+          <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="text-gray-600 hover:text-black transition-colors font-medium">
+              Dashboard
+            </Link>
+            <UserButton afterSignOutUrl="/" />
+          </div>
         </SignedIn>
       </div>
     </nav>
