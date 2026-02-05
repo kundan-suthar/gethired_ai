@@ -3,8 +3,8 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Check,  Lock, MousePointer2 } from "lucide-react";
-import { SignedOut } from "@clerk/nextjs";
-import { SignedIn, SignInButton, SignOutButton, SignUpButton, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignInButton, SignUpButton, UserButton, useUser, SignedOut } from "@clerk/nextjs";
+import { useEffect } from "react";
 
 const Navbar = () => {
   return (
@@ -183,6 +183,14 @@ const AudienceCard = ({ title, description, useCases, icon }: { title: string, d
 );
 
 export default function Home() {
+  const { isSignedIn, isLoaded } = useUser();
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      fetch("/api/user");
+    }
+  }, [isLoaded, isSignedIn]);
+
   return (
     <div className="min-h-screen bg-[#fafafa] font-[family-name:var(--font-geist-sans)] selection:bg-blue-100 relative overflow-hidden">
       {/* Decorative background lines */}

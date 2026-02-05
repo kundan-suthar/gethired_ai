@@ -4,6 +4,7 @@ export default function SignInPage() {
   return (
     <div className="flex justify-center">
       <SignIn
+        forceRedirectUrl="/onboarding"
         appearance={{
           elements: {
             formButtonPrimary: 
