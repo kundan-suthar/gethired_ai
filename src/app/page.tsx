@@ -1,50 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check,  Lock, MousePointer2 } from "lucide-react";
-import { SignedIn, SignInButton, SignUpButton, UserButton, useUser, SignedOut } from "@clerk/nextjs";
-import { useEffect } from "react";
-
-const Navbar = () => {
-  return (
-    <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full">
-      <div className="flex items-center gap-8">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 p-6 bg-black rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-xl ">get</span>
-          </div>
-          <span className="text-2xl font-bold tracking-tight">hired</span>
-        </div>
-        
-        <div className="hidden md:flex items-center gap-6 text-gray-600 font-medium">
-          <button className="flex items-center gap-1 hover:text-black transition-colors hover:cursor-pointer"
-            onClick={()=>{document.getElementById("solutions")?.scrollIntoView({behavior: "smooth"})}}
-          >
-            Solutions 
-          </button>
-          <button className="hover:text-black transition-colors hover:cursor-pointer" onClick={()=>{document.getElementById("who-is-it-for")?.scrollIntoView({behavior: "smooth"})}}>Who it's for</button>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-4">
-        <SignedOut>
-           <div className="flex items-center gap-2 text-gray-600 font-medium hover:text-black transition-colors hover:cursor-pointer">
-          <Lock size={18} />
-          <SignInButton />
-        </div>
-          <div className="bg-[#3b82f6] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-600 transition-all shadow-lg shadow-blue-500/20 hover:cursor-pointer">
-            <SignUpButton />
-          </div>
-        </SignedOut>
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-       
-      </div>
-    </nav>
-  );
-};
+import { Check, Lock, MousePointer2 } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
+import Navbar from "@/components/Navbar";
 
 const Badge = () => (
   <motion.div 
@@ -184,10 +144,15 @@ const AudienceCard = ({ title, description, useCases, icon }: { title: string, d
 
 export default function Home() {
   const { isSignedIn, isLoaded } = useUser();
+  const [isOnboarded, setIsOnboarded] = useState(false);
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      fetch("/api/user");
+      fetch("/api/user")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.industry) setIsOnboarded(true);
+        });
     }
   }, [isLoaded, isSignedIn]);
 
@@ -199,7 +164,7 @@ export default function Home() {
         <path d="M-50 600 C 150 700, 400 500, 700 650 S 1100 550, 1250 750" fill="none" stroke="black" strokeWidth="1" />
       </svg>
 
-      <Navbar />
+      <Navbar isOnboarded={isOnboarded} />
 
       <main className="max-w-7xl mx-auto px-8 pt-12 pb-24 grid lg:grid-cols-2 gap-20 items-center">
         {/* Left Content */}

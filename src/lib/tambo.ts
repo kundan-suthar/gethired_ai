@@ -17,6 +17,7 @@ import {
 import type { TamboComponent } from "@tambo-ai/react";
 import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
+import { getUserProfile } from "./actions/user";
 
 /**
  * tools
@@ -27,6 +28,22 @@ import { z } from "zod";
  */
 
 export const tools: TamboTool[] = [
+  {
+    name: "userProfile",
+    description:
+      "A tool to get the current user's profile information including industry, bio, experience, and skills. Use this to personalize the conversation or preparation advice.",
+    tool: getUserProfile,
+    inputSchema: z.object({}),
+    outputSchema: z.object({
+      id: z.string(),
+      name: z.string().nullable(),
+      email: z.string(),
+      industry: z.string().nullable(),
+      bio: z.string().nullable(),
+      experience: z.number().nullable(),
+      skills: z.array(z.string()),
+    }).nullable(),
+  },
   {
     name: "countryPopulation",
     description:
