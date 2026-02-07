@@ -8,15 +8,15 @@
  * Read more about Tambo at https://tambo.co/docs
  */
 
-import { Graph, graphSchema } from "@/components/tambo/graph";
-import { DataCard, dataCardSchema } from "@/components/ui/card-data";
-import {
-  getCountryPopulations,
-  getGlobalPopulationTrend,
-} from "@/services/population-stats";
+import { MultipleChoiceQuestion, mcqSchema } from "@/components/tambo/mcq";
+import { CodeOutputQuestion, codeOutputSchema } from "@/components/tambo/code-output-question";
+import { InterviewQuiz, interviewQuizSchema } from "@/components/tambo/Interview";
+import { QuizSequence, quizSequenceSchema } from "@/components/tambo/quiz-sequence";
+import { TechnicalQuiz, technicalQuizSchema } from "@/components/tambo/TechnicalQuiz";
 import type { TamboComponent } from "@tambo-ai/react";
 import { TamboTool } from "@tambo-ai/react";
 import { z } from "zod";
+import { getUserProfile } from "./actions/user";
 
 /**
  * tools
@@ -28,52 +28,21 @@ import { z } from "zod";
 
 export const tools: TamboTool[] = [
   {
-    name: "countryPopulation",
+    name: "userProfile",
     description:
-      "A tool to get population statistics by country with advanced filtering options",
-    tool: getCountryPopulations,
-    inputSchema: z.object({
-      continent: z.string().optional(),
-      sortBy: z.enum(["population", "growthRate"]).optional(),
-      limit: z.number().optional(),
-      order: z.enum(["asc", "desc"]).optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        countryCode: z.string(),
-        countryName: z.string(),
-        continent: z.enum([
-          "Asia",
-          "Africa",
-          "Europe",
-          "North America",
-          "South America",
-          "Oceania",
-        ]),
-        population: z.number(),
-        year: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
-  },
-  {
-    name: "globalPopulation",
-    description:
-      "A tool to get global population trends with optional year range filtering",
-    tool: getGlobalPopulationTrend,
-    inputSchema: z.object({
-      startYear: z.number().optional(),
-      endYear: z.number().optional(),
-    }),
-    outputSchema: z.array(
-      z.object({
-        year: z.number(),
-        population: z.number(),
-        growthRate: z.number(),
-      }),
-    ),
-  },
-  // Add more tools here
+      "A tool to get the current user's profile information including industry, bio, experience, and skills. Use this to personalize the conversation or preparation advice.",
+    tool: getUserProfile,
+    inputSchema: z.object({}),
+    outputSchema: z.object({
+      id: z.string(),
+      name: z.string().nullable(),
+      email: z.string(),
+      industry: z.string().nullable(),
+      bio: z.string().nullable(),
+      experience: z.number().nullable(),
+      skills: z.array(z.string()),
+    }).nullable(),
+  }
 ];
 
 /**
@@ -84,19 +53,40 @@ export const tools: TamboTool[] = [
  * can be controlled by AI to dynamically render UI elements based on user interactions.
  */
 export const components: TamboComponent[] = [
+
   {
-    name: "Graph",
+    name: "MultipleChoiceQuestion",
     description:
-      "A component that renders various types of charts (bar, line, pie) using Recharts. Supports customizable data visualization with labels, datasets, and styling options.",
-    component: Graph,
-    propsSchema: graphSchema,
+      "A component that displays a multiple choice question with options. It provides immediate feedback to the user on whether their selection was correct and can show an explanation.",
+    component: MultipleChoiceQuestion,
+    propsSchema: mcqSchema,
   },
   {
-    name: "DataCard",
+    name: "InterviewQuiz",
     description:
-      "A component that displays options as clickable cards with links and summaries with the ability to select multiple items.",
-    component: DataCard,
-    propsSchema: dataCardSchema,
+      "A specialized component that presents one of three technical interview questions about React, JavaScript, or System Design.",
+    component: InterviewQuiz,
+    propsSchema: interviewQuizSchema,
   },
-  // Add more components here
+  {
+    name: "QuizSequence",
+    description:
+      "A flexible quiz component that manages a sequence of multiple choice questions with progress tracking and navigation.",
+    component: QuizSequence,
+    propsSchema: quizSequenceSchema,
+  },
+  {
+    name: "TechnicalQuiz",
+    description:
+      "A specialized assessment component containing 5 technical interview questions covering React, JavaScript, and software design.",
+    component: TechnicalQuiz,
+    propsSchema: technicalQuizSchema,
+  },
+  {
+    name: "CodeOutputQuestion",
+    description:
+      "A specialized interactive component for JavaScript output-based questions. It shows a code snippet and asks the user to predict the exactly printed console output. This is specifically for JavaScript logic challenges like object keys, closures, hoisting, and array methods. Use this when the user needs to demonstrate deep understanding of JS execution.",
+    component: CodeOutputQuestion,
+    propsSchema: codeOutputSchema,
+  },
 ];

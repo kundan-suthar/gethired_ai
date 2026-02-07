@@ -98,3 +98,31 @@ export async function getUserOnboardingStatus(){
         return {isOnBoarded: false}
     }
 }
+
+export async function getUserProfile() {
+    const { userId } = await auth()
+    if (!userId) {
+        throw new Error("Unauthorized")
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                clerkuserId: userId
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                industry: true,
+                bio: true,
+                experience: true,
+                skills: true,
+            }
+        })
+        return user
+    } catch (error) {
+        console.error("Error in getUserProfile:", error);
+        return null
+    }
+}

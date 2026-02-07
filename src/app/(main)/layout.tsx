@@ -1,10 +1,13 @@
 import React from 'react'
 import Navbar from '@/components/Navbar'
+import { getUserOnboardingStatus } from '@/lib/actions/user'
 
-const MainLayout = ({children}: {children: React.ReactNode}) => {
+const MainLayout = async ({children}: {children: React.ReactNode}) => {
+  const { isOnBoarded } = await getUserOnboardingStatus().catch(() => ({ isOnBoarded: false }))
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Navbar isOnboarded={isOnBoarded} />
       <main className="flex-1 container mx-auto px-4 py-8">
         {children}
       </main>
