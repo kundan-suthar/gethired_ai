@@ -16,19 +16,14 @@ export const mcqSchema = z.object({
   correctAnswerIndex: z.number().describe("The index of the correct answer (0-indexed)"),
   explanation: z.string().optional().describe("Optional explanation shown after the user answers"),
   title: z.string().optional().describe("Optional title for the quiz card"),
-  onAnswer: z.function({
-    input: z.tuple([z.object({
-      index: z.number(),
-      isCorrect: z.boolean()
-    })]),
-    output: z.void()
-  }).optional().describe("Callback when an answer is selected"),
 });
 
 /**
  * Type inferred from the Zod schema
  */
-export type MCQProps = z.infer<typeof mcqSchema> & HTMLMotionProps<"div">;
+export type MCQProps = z.infer<typeof mcqSchema> & HTMLMotionProps<"div"> & {
+  onAnswer?: (data: { index: number; isCorrect: boolean }) => void;
+};
 
 /**
  * State type for the MCQ component
