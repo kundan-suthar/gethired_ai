@@ -40,7 +40,7 @@ const Dashboard = async () => {
       title: "Open Interview Tutor",
       description: "Chat with Tambo, your AI career coach, to get real-time feedback and interview tips.",
       icon: <MessageSquare className="w-8 h-8 text-purple-500" />,
-      href: "/chat",
+      href: "/tutor",
       color: "bg-purple-50",
       borderColor: "border-purple-100",
       buttonText: "Start Chat"

@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
 import DOMPurify from "dompurify";
+import { evaluateAnswer } from "@/lib/actions/evaluateAnswer";
 
 /**
  * Zod schema for Code Output Question component props
@@ -50,6 +51,7 @@ export const CodeOutputQuestion: React.FC<CodeOutputProps> = ({
 }) => {
   // Unique ID based on code hash to avoid state collision
   const componentId = React.useMemo(() => {
+    if (!code) return "code-output-loading";
     let hash = 0;
     for (let i = 0; i < code.length; i++) {
       hash = ((hash << 5) - hash) + code.charCodeAt(i);
@@ -64,6 +66,7 @@ export const CodeOutputQuestion: React.FC<CodeOutputProps> = ({
   );
 
   const highlightedCode = React.useMemo(() => {
+    if (!code) return "";
     try {
       return hljs.highlight(code, { language: 'javascript' }).value;
     } catch {
@@ -71,23 +74,34 @@ export const CodeOutputQuestion: React.FC<CodeOutputProps> = ({
     }
   }, [code]);
 
+  // Guard against missing props during initial AI rendering
+  if (!code || !question || !correctAnswer) {
+    return (
+      <div className="w-full max-w-lg mx-auto p-8 bg-zinc-50 dark:bg-zinc-900 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 animate-pulse flex flex-col items-center justify-center gap-4">
+        <HelpCircle className="w-8 h-8 text-zinc-300" />
+        <p className="text-zinc-400 text-sm font-medium">Preparing challenge...</p>
+      </div>
+    );
+  }
+
   if (!state) return null;
 
-  const handleCheck = () => {
+  const handleCheck =async () => {
     if (state.hasChecked) return;
+      
+    const result = await evaluateAnswer({
+    code,
+    question,
+    correctAnswer,
+    userAnswer: state.userValue
+  });
+
+  setState({
+    userValue: state.userValue,
+    hasChecked: true,
+    isCorrect: result.isCorrect
+  });
     
-    // Normalize both strings for comparison (remove whitespace, case insensitive optionally)
-    // Actually, console output is usually strict, so let's keep it close but maybe trim.
-    const normalizedUser = state.userValue.trim();
-    const normalizedCorrect = correctAnswer.trim();
-    
-    const isCorrect = normalizedUser === normalizedCorrect;
-    
-    setState({
-      userValue: state.userValue,
-      hasChecked: true,
-      isCorrect,
-    });
   };
 
   const handleReset = () => {
@@ -133,9 +147,9 @@ export const CodeOutputQuestion: React.FC<CodeOutputProps> = ({
       {/* Code Area */}
       <div className="px-6 py-4 bg-zinc-900 dark:bg-black/40">
         <div className="relative group">
-          <pre className="text-sm font-mono leading-relaxed overflow-x-auto p-4 rounded-xl bg-zinc-950/50 border border-zinc-800/50 scrollbar-hide">
+          <pre className="text-sm font-mono leading-relaxed overflow-x-auto p-4 rounded-xl bg-zinc-950/80 border border-zinc-800/50 scrollbar-hide">
             <code 
-              className="javascript"
+              className="hljs language-javascript text-zinc-100"
               dangerouslySetInnerHTML={{ 
                 __html: DOMPurify.sanitize(highlightedCode) 
               }}
